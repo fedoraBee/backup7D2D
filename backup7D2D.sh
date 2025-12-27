@@ -3,9 +3,8 @@
 ################################################################################
 # 7D2D Backup & Restore Script (Linux Professional Edition)
 # Version: 1.2
-# Author: lovelyBee
-# Source: https://github.com/lovelyBee/backup7D2D
-# Inspired by: https://github.com/LewsTherinSedai/Public/tree/main/Games/7D2D)
+# Author: fedoraBee
+# Source: https://github.com/fedoraBee/backup7D2D
 #
 # Description:
 #   A robust backup utility for 7 Days to Die on Linux.
