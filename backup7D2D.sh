@@ -8,10 +8,22 @@
 #
 # Description:
 #   A robust backup utility for 7 Days to Die on Linux.
-#   - Defaults to .tar.gz (native Linux compression)
-#   - Supports .zip via command line or menu
-#   - Includes a PreRestore safety snapshot
-#   - Full color-coded interactive CLI
+#
+# License:
+#   Copyright (C) 2025 fedoraBee
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ################################################################################
 
 # --- Configuration ---
@@ -49,10 +61,17 @@ usage() {
     echo -e "  -h, --help       Show this help message"
     echo -e "  -b, --backup     Run in non-interactive backup mode"
     echo -e "  -t, --type TYPE  Backup type: 'Default' or 'All' (requires -b)"
-    echo -e "  -f, --format FMT Format: 'tar.gz' or 'zip'"
+    echo -e "  -f, --format FMT Format: 'tar.gz', 'zip', or 'tar' (no compression)"
     echo -e "  -o, --output DIR Output backup path (default: $BACKUP_PATH)"
     echo -e "  -s, --save-path DIR Save root path (default: $SAVE_ROOT)"
     echo -e "  -n, --name NAME  Default save name (default: $DEFAULT_SAVE_NAME)"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo -e "  $0 --backup                        # Quick backup of default save"
+    echo -e "  $0 -b -t All                       # Backup all saves in root path"
+    echo -e "  $0 -b -f tar                       # Fastest backup (no compression)"
+    echo -e "  $0 -b -o /mnt/backups/7d2d         # Backup to custom directory"
+    echo -e "  $0 -b -n \"MyWorld\"                 # Backup a specific world by name"
     echo ""
 }
 
@@ -103,6 +122,9 @@ backup_folder() {
     if [[ "$FORMAT" == "zip" ]]; then
         if [[ -z "$ZIP_BIN" ]]; then echo -e "${RED}Error: 'zip' utility not found.${NC}"; return; fi
         (cd "$(dirname "$target_folder")" && "$ZIP_BIN" -rq "$dest_file" "$(basename "$target_folder")")
+    elif [[ "$FORMAT" == "tar" ]]; then
+        # Uncompressed tar
+        "$TAR_BIN" -cf "$dest_file" -C "$(dirname "$target_folder")" "$(basename "$target_folder")"
     else
         # Standard tar.gz creation
         "$TAR_BIN" -czf "$dest_file" -C "$(dirname "$target_folder")" "$(basename "$target_folder")"
@@ -126,6 +148,8 @@ restore_folder() {
     echo -e "${YELLOW}Restoring files...${NC}"
     if [[ "$archive_file" == *.zip ]]; then
         "$UNZIP_BIN" -o "$archive_file" -d "$(dirname "$restore_path")" > /dev/null
+    elif [[ "$archive_file" == *.tar ]]; then
+        "$TAR_BIN" -xf "$archive_file" -C "$(dirname "$restore_path")"
     else
         "$TAR_BIN" -xzf "$archive_file" -C "$(dirname "$restore_path")"
     fi
@@ -134,8 +158,8 @@ restore_folder() {
 
 select_backup() {
     local pattern="$1"
-    # Search for both supported types
-    mapfile -t files < <(ls -t "$BACKUP_PATH"/${pattern}*.{zip,tar.gz} 2>/dev/null | head -n 10)
+    # Search for all supported types
+    mapfile -t files < <(ls -t "$BACKUP_PATH"/${pattern}*.{zip,tar.gz,tar} 2>/dev/null | head -n 10)
     
     if [[ ${#files[@]} -eq 0 ]]; then
         echo -e "${RED}No backups found for pattern: $pattern${NC}"; return 1
@@ -233,7 +257,7 @@ while true; do
     echo -e "2. Backup ALL saves"
     echo -e "3. Restore default save"
     echo -e "4. Restore ALL saves"
-    echo -e "5. Toggle Format (${YELLOW}ZIP / TAR.GZ${NC})"
+    echo -e "5. Toggle Format (${YELLOW}ZIP / TAR.GZ / TAR${NC})"
     echo -e "6. Exit"
     echo ""
     read -p "Please select an option (1-6): " choice
@@ -252,7 +276,13 @@ while true; do
             fi
         ;;
         5)
-            [[ "$FORMAT" == "tar.gz" ]] && FORMAT="zip" || FORMAT="tar.gz"
+            if [[ "$FORMAT" == "tar.gz" ]]; then
+                FORMAT="zip"
+            elif [[ "$FORMAT" == "zip" ]]; then
+                FORMAT="tar"
+            else
+                FORMAT="tar.gz"
+            fi
             echo -e "${GREEN}Format set to: $FORMAT${NC}"
             sleep 1
             continue

@@ -6,7 +6,7 @@ Inspired by a Powershell backup script from [LewsTherinSedai](https://github.com
 
 ## Key Features
 
-*   **Dual Format Support:** Defaults to **`.tar.gz`** for native Linux efficiency, with optional **`.zip`** support for cross-platform compatibility.
+*   **Multi-Format Support:** Defaults to **`.tar.gz`** for native Linux efficiency, with optional **`.zip`** support for cross-platform compatibility, and **`.tar`** for maximum speed (no compression).
 *   **Safety First:** Automatically triggers a **PreRestore snapshot** before overwriting any data during a restore operation, ensuring you never lose progress accidentally.
 *   **Flexible Scope:** Backup a specific "default" save game or the entire Saves directory.
 *   **Interactive CLI:** Color-coded, menu-driven interface for easy manual management.
@@ -63,7 +63,7 @@ You will be presented with a menu:
 2.  **Backup ALL saves:** Backs up the entire `SAVE_ROOT`.
 3.  **Restore default save:** Lists available backups for the default save and restores the selection.
 4.  **Restore ALL saves:** Lists available backups for the global saves folder and restores the selection.
-5.  **Toggle Format:** Switch between `.tar.gz` and `.zip` for the current session.
+5.  **Toggle Format:** Switch between `.tar.gz`, `.zip`, and `.tar` (uncompressed) for the current session.
 
 ### 2. Automation (Command Line)
 Use flags to bypass the menu, ideal for scheduled backups.
@@ -73,7 +73,7 @@ Use flags to bypass the menu, ideal for scheduled backups.
 | `-h`, `--help` | N/A | Show help message. |
 | `-b`, `--backup` | N/A | **Required.** Triggers the backup action immediately. |
 | `-t`, `--type` | `Default`, `All` | **Optional.** Defaults to `Default`. Determines if you backup the single target save or everything. |
-| `-f`, `--format` | `tar.gz`, `zip` | **Optional.** Defaults to `tar.gz`. Overrides the script default format. |
+| `-f`, `--format` | `tar.gz`, `zip`, `tar` | **Optional.** Defaults to `tar.gz`. Overrides the script default format. Use `tar` for no compression. |
 | `-o`, `--output` | PATH | **Optional.** Custom output backup path. |
 | `-s`, `--save-path` | PATH | **Optional.** Custom save root directory. |
 | `-n`, `--name` | NAME | **Optional.** Custom default save name. |
@@ -95,12 +95,31 @@ Use flags to bypass the menu, ideal for scheduled backups.
 ./backup7D2D.sh --backup --format zip
 ```
 
+**Backup default save with no compression (Fastest):**
+```bash
+./backup7D2D.sh --backup --format tar
+```
+
+**Backup to a custom directory:**
+```bash
+./backup7D2D.sh -b -o /mnt/external_drive/7d2d_backups
+```
+
+**Backup a specific world/save by name:**
+```bash
+./backup7D2D.sh -b -n "MyCustomWorld"
+```
+
 ## Restoration & Safety
 When you choose to **Restore**, the script performs the following actions:
 1.  **Safety Snapshot:** Immediately creates a backup of the *current* state of the target folder (suffixed with `_PreRestore`).
 2.  **Extraction:** Decompresses the selected archive, overwriting files in the target directory.
 
 This ensures that if you restore the wrong file or change your mind, your pre-restore state is safely saved in the backup folder.
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for the full text.
 
 ## Credits
 *   **Author:** [fedoraBee](https://github.com/fedoraBee)
