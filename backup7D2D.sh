@@ -44,6 +44,18 @@ ALL_SAVES_PREFIX="ALLSAVES"
 
 # --- UI Functions ---
 
+usage() {
+    echo -e "${CYAN}Usage: $0 [OPTIONS]${NC}"
+    echo -e "  -h, --help       Show this help message"
+    echo -e "  -b, --backup     Run in non-interactive backup mode"
+    echo -e "  -t, --type TYPE  Backup type: 'Default' or 'All' (requires -b)"
+    echo -e "  -f, --format FMT Format: 'tar.gz' or 'zip'"
+    echo -e "  -o, --output DIR Output backup path (default: $BACKUP_PATH)"
+    echo -e "  -s, --save-path DIR Save root path (default: $SAVE_ROOT)"
+    echo -e "  -n, --name NAME  Default save name (default: $DEFAULT_SAVE_NAME)"
+    echo ""
+}
+
 print_llama() {
     echo -e "${MAGENTA}            __--_--_-_"
     echo -e "           ( I wish I  )"
@@ -145,15 +157,62 @@ select_backup() {
 
 # --- Parameter Support ---
 
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        --backup) ACTION="backup" ;;
-        --type)   TYPE="$2"; shift ;;
-        --format) FORMAT="$2"; shift ;;
-        *) echo "Unknown parameter: $1"; exit 1 ;;
+# Use getopt for long option support
+PARSED_ARGS=$(getopt -o hbt:f:o:s:n: --long help,backup,type:,format:,output:,save-path:,name: --name "$0" -- "$@")
+if [[ $? -ne 0 ]]; then
+    usage
+    exit 1
+fi
+
+eval set -- "$PARSED_ARGS"
+
+while true; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        -b|--backup)
+            ACTION="backup"
+            shift
+            ;;
+        -t|--type)
+            TYPE="$2"
+            shift 2
+            ;;
+        -f|--format)
+            FORMAT="$2"
+            shift 2
+            ;;
+        -o|--output)
+            BACKUP_PATH="$2"
+            shift 2
+            ;;
+        -s|--save-path)
+            SAVE_ROOT="$2"
+            shift 2
+            ;;
+        -n|--name)
+            DEFAULT_SAVE_NAME="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
     esac
-    shift
 done
+
+# Re-evaluate dependent variables
+SAVE_GAME_FOLDER="$SAVE_ROOT/$DEFAULT_SAVE_NAME"
+DEFAULT_PREFIX=$(echo "$DEFAULT_SAVE_NAME" | tr ' ' '_')
+
+# Ensure backup path exists if changed
+[[ ! -d "$BACKUP_PATH" ]] && mkdir -p "$BACKUP_PATH"
 
 if [[ "$ACTION" == "backup" ]]; then
     TYPE=${TYPE:-"Default"}

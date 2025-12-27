@@ -68,11 +68,15 @@ You will be presented with a menu:
 ### 2. Automation (Command Line)
 Use flags to bypass the menu, ideal for scheduled backups.
 
-| Flag | Options | Description |
+| Flag (Short/Long) | Options | Description |
 | :--- | :--- | :--- |
-| `--backup` | N/A | **Required.** Triggers the backup action immediately. |
-| `--type` | `Default`, `All` | **Optional.** Defaults to `Default`. Determines if you backup the single target save or everything. |
-| `--format` | `tar.gz`, `zip` | **Optional.** Defaults to `tar.gz`. Overrides the script default format. |
+| `-h`, `--help` | N/A | Show help message. |
+| `-b`, `--backup` | N/A | **Required.** Triggers the backup action immediately. |
+| `-t`, `--type` | `Default`, `All` | **Optional.** Defaults to `Default`. Determines if you backup the single target save or everything. |
+| `-f`, `--format` | `tar.gz`, `zip` | **Optional.** Defaults to `tar.gz`. Overrides the script default format. |
+| `-o`, `--output` | PATH | **Optional.** Custom output backup path. |
+| `-s`, `--save-path` | PATH | **Optional.** Custom save root directory. |
+| `-n`, `--name` | NAME | **Optional.** Custom default save name. |
 
 #### Examples:
 
@@ -83,7 +87,7 @@ Use flags to bypass the menu, ideal for scheduled backups.
 
 **Backup ALL saves:**
 ```bash
-./backup7D2D.sh --backup --type All
+./backup7D2D.sh -b -t All
 ```
 
 **Backup default save as a ZIP file:**
