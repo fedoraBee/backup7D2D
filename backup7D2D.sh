@@ -2,7 +2,7 @@
 
 ################################################################################
 # 7D2D Backup & Restore Script (Linux Professional Edition)
-# Version: 1.0.0
+# Version: 1.0.1
 # Author: fedoraBee
 # Source: https://github.com/fedoraBee/backup7D2D
 #
@@ -124,7 +124,7 @@ backup_folder() {
     if [[ "$FORMAT" == "zip" ]]; then
         if [[ -z "$ZIP_BIN" ]]; then echo -e "${RED}Error: 'zip' utility not found.${NC}"; return; fi
         (cd "$(dirname "$target_folder")" && "$ZIP_BIN" -rq "$dest_file" "$(basename "$target_folder")")
-    elif [[ "$FORMAT" == "tar" ]]; then
+        elif [[ "$FORMAT" == "tar" ]]; then
         # Uncompressed tar
         "$TAR_BIN" -cf "$dest_file" -C "$(dirname "$target_folder")" "$(basename "$target_folder")"
     else
@@ -150,7 +150,7 @@ restore_folder() {
     echo -e "${YELLOW}Restoring files...${NC}"
     if [[ "$archive_file" == *.zip ]]; then
         "$UNZIP_BIN" -o "$archive_file" -d "$(dirname "$restore_path")" > /dev/null
-    elif [[ "$archive_file" == *.tar ]]; then
+        elif [[ "$archive_file" == *.tar ]]; then
         "$TAR_BIN" -xf "$archive_file" -C "$(dirname "$restore_path")"
     else
         "$TAR_BIN" -xzf "$archive_file" -C "$(dirname "$restore_path")"
@@ -197,44 +197,44 @@ while true; do
         -h|--help)
             usage
             exit 0
-            ;;
+        ;;
         -b|--backup)
             ACTION="backup"
             shift
-            ;;
+        ;;
         -r|--restore)
             ACTION="restore"
             RESTORE_FILE="$2"
             shift 2
-            ;;
+        ;;
         -t|--type)
             TYPE="$2"
             shift 2
-            ;;
+        ;;
         -f|--format)
             FORMAT="$2"
             shift 2
-            ;;
+        ;;
         -o|--output)
             BACKUP_PATH="$2"
             shift 2
-            ;;
+        ;;
         -s|--save-path)
             SAVE_ROOT="$2"
             shift 2
-            ;;
+        ;;
         -n|--name)
             DEFAULT_SAVE_NAME="$2"
             shift 2
-            ;;
+        ;;
         --)
             shift
             break
-            ;;
+        ;;
         *)
             echo "Programming error"
             exit 3
-            ;;
+        ;;
     esac
 done
 
@@ -263,10 +263,10 @@ if [[ "$ACTION" == "restore" ]]; then
     fi
     
     if [[ ! -f "$RESTORE_FILE" ]]; then
-         echo -e "${RED}Error: File $RESTORE_FILE not found.${NC}"
-         exit 1
+        echo -e "${RED}Error: File $RESTORE_FILE not found.${NC}"
+        exit 1
     fi
-
+    
     # Heuristic for restore path based on filename or explicit type
     if [[ $(basename "$RESTORE_FILE") == "$ALL_SAVES_PREFIX"* ]]; then
         TARGET_PATH="$SAVE_ROOT"
@@ -308,7 +308,7 @@ while true; do
         5)
             if [[ "$FORMAT" == "tar.gz" ]]; then
                 FORMAT="zip"
-            elif [[ "$FORMAT" == "zip" ]]; then
+                elif [[ "$FORMAT" == "zip" ]]; then
                 FORMAT="tar"
             else
                 FORMAT="tar.gz"
