@@ -99,6 +99,6 @@ When you choose to **Restore**, the script performs the following actions:
 This ensures that if you restore the wrong file or change your mind, your pre-restore state is safely saved in the backup folder.
 
 ## Credits
-*   **Author:** fedoraBee
+*   **Author:** [fedoraBee](https://github.com/fedoraBee)
 *   **Source:** [GitHub](https://github.com/fedoraBee/backup7D2D)
 *   **Inspiration:** [LewsTherinSedai's Public Repo](https://github.com/LewsTherinSedai/Public/tree/main/Games/7D2D)
