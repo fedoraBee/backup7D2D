@@ -15,15 +15,24 @@ Inspired by a Powershell backup script from [LewsTherinSedai](https://github.com
 
 ## Prerequisites
 
-Ensure you have the standard compression utilities installed. Most Linux distributions have `tar` by default.
+The script requires **Bash 4.0+** and standard Linux utilities. Most are pre-installed on major distributions.
 
-For ZIP support:
+*   **tar:** For default compression (usually pre-installed).
+*   **util-linux:** Provides `getopt` for advanced argument parsing.
+*   **coreutils:** Provides `realpath`.
+*   **zip / unzip:** Required only if you use the `.zip` format.
+
+### Installation of Dependencies
+
+**Fedora:**
 ```bash
-# Fedora
-sudo dnf install zip unzip
+sudo dnf install tar util-linux coreutils zip unzip
+```
 
-# Ubuntu/Debian
-sudo apt install zip unzip
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install tar util-linux coreutils zip unzip
 ```
 
 ## Installation
@@ -71,7 +80,8 @@ Use flags to bypass the menu, ideal for scheduled backups.
 | Flag (Short/Long) | Options | Description |
 | :--- | :--- | :--- |
 | `-h`, `--help` | N/A | Show help message. |
-| `-b`, `--backup` | N/A | **Required.** Triggers the backup action immediately. |
+| `-b`, `--backup` | N/A | Triggers the backup action immediately. |
+| `-r`, `--restore` | FILE | Triggers the restore action for the specified backup file. |
 | `-t`, `--type` | `Default`, `All` | **Optional.** Defaults to `Default`. Determines if you backup the single target save or everything. |
 | `-f`, `--format` | `tar.gz`, `zip`, `tar` | **Optional.** Defaults to `tar.gz`. Overrides the script default format. Use `tar` for no compression. |
 | `-o`, `--output` | PATH | **Optional.** Custom output backup path. |
@@ -108,6 +118,11 @@ Use flags to bypass the menu, ideal for scheduled backups.
 **Backup a specific world/save by name:**
 ```bash
 ./backup7D2D.sh -b -n "MyCustomWorld"
+```
+
+**Restore a specific backup:**
+```bash
+./backup7D2D.sh --restore ./my_backup.tar.gz
 ```
 
 ## Restoration & Safety

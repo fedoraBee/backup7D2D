@@ -60,6 +60,7 @@ usage() {
     echo -e "${CYAN}Usage: $0 [OPTIONS]${NC}"
     echo -e "  -h, --help       Show this help message"
     echo -e "  -b, --backup     Run in non-interactive backup mode"
+    echo -e "  -r, --restore FILE Restore a specific backup file"
     echo -e "  -t, --type TYPE  Backup type: 'Default' or 'All' (requires -b)"
     echo -e "  -f, --format FMT Format: 'tar.gz', 'zip', or 'tar' (no compression)"
     echo -e "  -o, --output DIR Output backup path (default: $BACKUP_PATH)"
@@ -69,6 +70,7 @@ usage() {
     echo -e "${YELLOW}Examples:${NC}"
     echo -e "  $0 --backup                        # Quick backup of default save"
     echo -e "  $0 -b -t All                       # Backup all saves in root path"
+    echo -e "  $0 -r ./my_backup.tar.gz           # Restore a specific backup"
     echo -e "  $0 -b -f tar                       # Fastest backup (no compression)"
     echo -e "  $0 -b -o /mnt/backups/7d2d         # Backup to custom directory"
     echo -e "  $0 -b -n \"MyWorld\"                 # Backup a specific world by name"
@@ -182,7 +184,7 @@ select_backup() {
 # --- Parameter Support ---
 
 # Use getopt for long option support
-PARSED_ARGS=$(getopt -o hbt:f:o:s:n: --long help,backup,type:,format:,output:,save-path:,name: --name "$0" -- "$@")
+PARSED_ARGS=$(getopt -o hbt:f:o:s:n:r: --long help,backup,type:,format:,output:,save-path:,name:,restore: --name "$0" -- "$@")
 if [[ $? -ne 0 ]]; then
     usage
     exit 1
@@ -199,6 +201,11 @@ while true; do
         -b|--backup)
             ACTION="backup"
             shift
+            ;;
+        -r|--restore)
+            ACTION="restore"
+            RESTORE_FILE="$2"
+            shift 2
             ;;
         -t|--type)
             TYPE="$2"
@@ -237,6 +244,7 @@ DEFAULT_PREFIX=$(echo "$DEFAULT_SAVE_NAME" | tr ' ' '_')
 
 # Ensure backup path exists if changed
 [[ ! -d "$BACKUP_PATH" ]] && mkdir -p "$BACKUP_PATH"
+BACKUP_PATH=$(realpath "$BACKUP_PATH")
 
 if [[ "$ACTION" == "backup" ]]; then
     TYPE=${TYPE:-"Default"}
@@ -245,6 +253,28 @@ if [[ "$ACTION" == "backup" ]]; then
     else
         backup_folder "$SAVE_ROOT" "All"
     fi
+    exit 0
+fi
+
+if [[ "$ACTION" == "restore" ]]; then
+    if [[ -z "$RESTORE_FILE" ]]; then
+        echo -e "${RED}Error: Restore file not specified.${NC}"
+        exit 1
+    fi
+    
+    if [[ ! -f "$RESTORE_FILE" ]]; then
+         echo -e "${RED}Error: File $RESTORE_FILE not found.${NC}"
+         exit 1
+    fi
+
+    # Heuristic for restore path based on filename or explicit type
+    if [[ $(basename "$RESTORE_FILE") == "$ALL_SAVES_PREFIX"* ]]; then
+        TARGET_PATH="$SAVE_ROOT"
+    else
+        TARGET_PATH="$SAVE_GAME_FOLDER"
+    fi
+    
+    restore_folder "$TARGET_PATH" "$RESTORE_FILE"
     exit 0
 fi
 
