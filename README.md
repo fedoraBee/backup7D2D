@@ -1,6 +1,6 @@
-# 7D2D Backup & Restore Script (Linux Professional Edition)
+# 7D2D Backup & Restore Script (Linux Edition)
 
-A robust, professional-grade Bash utility designed for managing **7 Days to Die** save games on Linux. This tool offers an interactive menu for ease of use and powerful command-line arguments for automation.
+A robust Bash utility designed for managing **7 Days to Die** save games on Linux. This tool offers an interactive menu for ease of use and powerful command-line arguments for automation.
 
 Inspired by a Powershell backup script from [LewsTherinSedai](https://github.com/LewsTherinSedai/Public/tree/main/Games/7D2D), this Linux port is optimized for performance and reliability on distributions like Fedora, Ubuntu, and Debian.
 
