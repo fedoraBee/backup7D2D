@@ -2,7 +2,7 @@
 
 ################################################################################
 # 7D2D Backup & Restore Script (Linux Professional Edition)
-# Version: 1.2
+# Version: 1.0.0
 # Author: fedoraBee
 # Source: https://github.com/fedoraBee/backup7D2D
 #
